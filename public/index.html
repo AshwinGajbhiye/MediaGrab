@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Download Instagram Reels in the highest video quality. Paste any reel link and save it instantly.">
+  <meta name="color-scheme" content="dark">
+  <title>MediaGrab — Instagram & YouTube Downloader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- Animated gradient orbs background -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <main class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+            <rect x="2" y="2" width="20" height="20" rx="6" stroke="url(#igGrad)" stroke-width="2"/>
+            <circle cx="12" cy="12" r="5" stroke="url(#igGrad)" stroke-width="2"/>
+            <circle cx="17.5" cy="6.5" r="1.5" fill="url(#igGrad)"/>
+            <defs>
+              <linearGradient id="igGrad" x1="2" y1="22" x2="22" y2="2">
+                <stop stop-color="#F58529"/>
+                <stop offset="0.5" stop-color="#DD2A7B"/>
+                <stop offset="1" stop-color="#8134AF"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="logo-text">Media<span class="logo-highlight">Grab</span></span>
+      </div>
+      <p class="tagline">Download Instagram Reels & YouTube Shorts in the highest quality</p>
+    </header>
+
+    <!-- Input Section -->
+    <section class="input-section" aria-label="Reel URL input">
+      <div class="input-card">
+        <div class="input-wrapper">
+          <div class="input-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <input
+            type="url"
+            id="url-input"
+            class="url-input"
+            placeholder="Paste Instagram or YouTube link here..."
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Instagram Reel URL"
+          >
+          <button id="clear-btn" class="clear-btn" type="button" aria-label="Clear input" hidden>
+            <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+              <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <button id="fetch-btn" class="fetch-btn" type="button">
+          <span class="btn-text">Download Reel</span>
+          <span class="btn-loader" hidden>
+            <span class="spinner"></span>
+            <span>Fetching...</span>
+          </span>
+          <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" width="20" height="20">
+            <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <p class="hint">Supports: instagram.com/reel/..., youtube.com/watch..., youtu.be/...</p>
+    </section>
+
+    <!-- Error Message -->
+    <div id="error-container" class="error-container" hidden>
+      <div class="error-card">
+        <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+          <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="12" cy="16" r="1" fill="currentColor"/>
+        </svg>
+        <span id="error-text"></span>
+      </div>
+    </div>
+
+    <!-- Result Section -->
+    <section id="result-section" class="result-section" hidden aria-label="Download result">
+      <div class="result-card">
+        <div class="result-preview">
+          <img id="result-thumbnail" src="" alt="Reel thumbnail" class="thumbnail">
+          <div class="play-overlay" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="48" height="48">
+              <polygon points="5,3 19,12 5,21"/>
+            </svg>
+          </div>
+        </div>
+        <div class="result-info">
+          <p id="result-description" class="result-description"></p>
+          <div id="download-buttons" class="download-buttons"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features" aria-label="Features">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" width="24" height="24">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3>Lightning Fast</h3>
+        <p>Instant video extraction with no waiting. Paste, click, download.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" width="24" height="24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3>100% Private</h3>
+        <p>No data stored. No tracking. Your downloads stay yours.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" width="24" height="24">
+            <rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+            <path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Highest Quality</h3>
+        <p>Downloads in the maximum available resolution — no compression.</p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Built for personal use. Not affiliated with Instagram or Meta.</p>
+    </footer>
+  </main>
+
+  <script src="/script.js"></script>
+</body>
+</html>
