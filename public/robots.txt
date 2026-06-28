@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://mediagrab-e2xt.onrender.com/sitemap.xml
