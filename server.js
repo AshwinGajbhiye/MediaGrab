@@ -27,54 +27,51 @@ app.post('/api/fetch-reel', async (req, res) => {
     if (!rapidApiKey || !rapidApiHost || !rapidApiEndpoint) {
       return res.status(500).json({
         error: 'RAPIDAPI_KEY, RAPIDAPI_HOST, or RAPIDAPI_URL is missing in your .env file!'
+    if (!rapidApiKey) {
+      return res.status(500).json({
+        error: 'RAPIDAPI_KEY is missing in your .env file!'
       });
     }
 
-    console.log(`\n🔍 Fetching Reel via RapidAPI: ${url}`);
-
-    // Call the RapidAPI endpoint
-    const response = await axios.get(rapidApiEndpoint, {
-      params: { url: url },
+    const options = {
+      method: 'GET',
+      url: 'https://instagram-scraper-api2.p.rapidapi.com/v1/post_info',
+      params: { code_or_id_or_url: url },
       headers: {
-        'X-RapidAPI-Key': rapidApiKey,
-        'X-RapidAPI-Host': rapidApiHost
+        'x-rapidapi-key': rapidApiKey,
+        'x-rapidapi-host': 'instagram-scraper-api2.p.rapidapi.com'
       }
-    });
-
-    const data = response.data;
-    
-    // The specific API "Instagram Downloader - Scraper" structure
-    if (!data || !data.media || data.media.length === 0) {
-      return res.status(404).json({ error: 'Failed to extract video data from the API.' });
-    }
-
-    const item = data.media[0];
-    
-    if (!item.is_video) {
-        return res.status(404).json({ error: 'This URL points to an image, not a video.' });
-    }
-
-    const videos = [{
-      url: item.url,
-      quality: 'High'
-    }];
-
-    const metadata = {
-      thumbnail: item.thumb || '',
-      description: item.caption || 'Instagram Reel',
-      uploader: item.owner?.username || 'Instagram User'
     };
 
-    console.log(`  ✓ Extraction successful!`);
-    res.json({ success: true, videos, metadata });
+    console.log(`\n🔍 Fetching Reel via RapidAPI: ${url}`);
+    
+    const response = await axios.request(options);
 
-  } catch (err) {
-    console.error('  ✗ Error:', err.message);
-    if (err.response) {
-      console.error('API Response:', err.response.data);
-      if (err.response.status === 403) {
-         return res.status(403).json({ error: 'RapidAPI Key is invalid or you are not subscribed.' });
-      }
+    // Parse instagram-scraper-api2 response
+    if (response.data && response.data.data && response.data.data.video_url) {
+        console.log('  ✓ Extraction successful!');
+        return res.json({
+          videos: [ { url: response.data.data.video_url, quality: 'HD' } ],
+          metadata: {
+            thumbnail: response.data.data.thumbnail_url || '',
+            description: response.data.data.caption_text || 'Instagram Reel',
+            uploader: response.data.data.owner?.username || 'Instagram User'
+          }
+        });
+    } else {
+        console.log('  ✗ Video URL not found in RapidAPI response');
+        return res.status(500).json({ error: 'Could not extract video URL from RapidAPI response', details: response.data });
+    }
+  } catch (error) {
+    console.log(`  ✗ Error: ${error.message}`);
+    if (error.response) {
+       console.log('API Response:', error.response.data);
+       if (error.response.data.message === 'You are not subscribed to this API.') {
+          return res.status(403).json({ error: 'API_NOT_SUBSCRIBED', message: 'You must subscribe to instagram-scraper-api2 on RapidAPI.' });
+       }
+       if (error.response.status === 403) {
+          return res.status(403).json({ error: 'RapidAPI Key is invalid or you are not subscribed.' });
+       }
     }
     res.status(500).json({ error: 'API Request failed. Check your API key and limits.' });
   }
