@@ -193,11 +193,16 @@ app.get('/api/download', async (req, res) => {
     const parsedUrl = new URL(videoUrl);
     const protocol = parsedUrl.protocol === 'https:' ? https : http;
 
+    const isYouTube = videoUrl.includes('googlevideo.com') || videoUrl.includes('youtube');
+    const headers = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    };
+    if (!isYouTube) {
+      headers['Referer'] = 'https://www.instagram.com/';
+    }
+
     const proxyReq = protocol.get(videoUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15',
-        'Referer': 'https://www.instagram.com/',
-      },
+      headers: headers
     }, (proxyRes) => {
       if ([301, 302, 303, 307].includes(proxyRes.statusCode) && proxyRes.headers.location) {
         res.redirect(`/api/download?url=${encodeURIComponent(proxyRes.headers.location)}`);
@@ -207,13 +212,13 @@ app.get('/api/download', async (req, res) => {
 
       if (proxyRes.statusCode !== 200) {
         proxyRes.resume();
-        if (!res.headersSent) res.status(502).json({ error: 'Failed to download video from CDN' });
+        if (!res.headersSent) res.status(502).json({ error: 'Failed to download video from CDN', status: proxyRes.statusCode });
         return;
       }
 
       const contentType = proxyRes.headers['content-type'] || 'video/mp4';
       res.setHeader('Content-Type', contentType);
-      res.setHeader('Content-Disposition', `attachment; filename="instagram_reel_${Date.now()}.mp4"`);
+      res.setHeader('Content-Disposition', `attachment; filename="mediagrab_${isYouTube ? 'youtube' : 'insta'}_${Date.now()}.mp4"`);
       if (proxyRes.headers['content-length']) {
         res.setHeader('Content-Length', proxyRes.headers['content-length']);
       }
